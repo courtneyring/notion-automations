@@ -5,13 +5,13 @@ const parent = {
   type: 'database_id',
   database_id: 'fdae95c80f954bc595d659e8accbe15e'
 }
+const database_id = 'fdae95c80f954bc595d659e8accbe15e'
 
 function weekOfMonth(m) {
   return m.week() - moment(m).startOf('month').week();
 }
 
 const existingCheck = async (name) => {
-  let database_id = 'fdae95c80f954bc595d659e8accbe15e'
   let filter = {
     and: [
       {
@@ -21,9 +21,9 @@ const existingCheck = async (name) => {
         },
       },
       {
-        property: 'Due',
+        property: 'Scheduled',
         date: {
-          on_or_after: moment().subtract(1, 'week').day(0).format('YYYY-MM-DD')
+          on_or_before: moment().format('YYYY-MM-DD')
         }
       },
       {
@@ -34,23 +34,37 @@ const existingCheck = async (name) => {
       }
     ],
   }
-  let resp = queryDatabase({database_id, filter})
-  return !!resp.results.length
+  let resp = await queryDatabase({database_id, filter})
+  console.log(resp)
+  return resp.results
 }
 
 const createJournal = async () => {
-  if (existingCheck('Journal')) return
   let startDate = moment().day(4).format('YYYY-MM-DD')
   let properties = {
     Name: { type: 'title', title: [{ text: { content: 'Journal' } }] },
-    Due: { type: 'date', date: { start: startDate } },
+    Scheduled: { type: 'date', date: { start: startDate } },
+    Category: {type: 'multi_select', multi_select: [{name: 'Photos'}] }
   }
-  createPage(parent, properties)
+
+  let existingTasks = await existingCheck('Journal');
+  if (existingTasks.length) {
+    await updatePage({ page_id: existingTasks[0].id, properties })
+    console.log('Updated Journal Page')
+  }
+  else {
+    createPage(parent, properties)
+    console.log('Created Journal Page')
+  }
+  
 }
 
 
 const createClean = async () => {
-  if (existingCheck('Clean')) return
+  if (await existingCheck('Clean')) {
+    console.log('Clean Task Exists')
+    return
+  }
   let roomArr = ['Kitchen', 'Bedroom', 'Bathroom']
   let room = roomArr[weekOfMonth(moment())]
 
@@ -61,19 +75,25 @@ const createClean = async () => {
       Due: { type: 'date', date: { start: startDate } },
     }
     createPage(parent, properties)
+    console.log('Created Clean Task')
   }
+  console.log('No Clean Task Created')
 }
 
+const _findNext = async () => {
+  const sorts = [
+    {
+      property: 'Name',
+      direction: 'descending',
+    },
+  ]
 
-const createPhotosTask = async () => {
-  if (existingCheck('Photos')) return
-  let database_id = 'fdae95c80f954bc595d659e8accbe15e'
   let filter = {
     and: [
       {
-        property: 'Parent item',
-        relation: {
-          contains: 'ef1c3b3fc51448f5bb9708fc0138d9d5',
+        property: 'Category',
+        multi_select: {
+          contains: 'Photos',
         },
       },
       {
@@ -84,27 +104,69 @@ const createPhotosTask = async () => {
       }
     ],
   }
-  let sorts = [
-    {
-      property: 'Name',
-      direction: 'descending',
-    },
-  ]
   let resp = await queryDatabase({ database_id, filter, sorts })
-  let latest = resp.results[0]
-  let properties = {
-    Due: {
-      date: { start: moment().day(2).format('YYYY-MM-DD') }
+  let next = resp.results[0]
+  return next
+}
+
+const createPhotosTask = async () => {
+  const properties = {
+    Scheduled: {
+      date: { start: moment().day(3).format('YYYY-MM-DD') }
     }
   }
-  updatePage({page_id: latest.id, properties})
+  let existingTasks = await existingCheck('Photos');
+  let pageToUpdate = existingTasks.length > 0 ? existingTasks[0] : await _findNext();
+  await updatePage({ page_id: pageToUpdate.id, properties})
+  console.log('Updated Photos Task')
+}
+
+const _createPrs = () => {
+  let properties = {
+    Name: { type: 'title', title: [{ text: { content: 'PRs' } }] },
+    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
+  }
+
+  for (let i = 1; i < 6; i++) {
+    properties['Scheduled'] = { type: 'date', date: { start: moment().day(i).format('YYYY-MM-DD') } },
+      createPage(parent, properties)
+  }
+}
+
+const _createTimesheets = () => {
+  let properties = {
+    Name: { type: 'title', title: [{ text: { content: 'Timesheets' } }] },
+    Scheduled: { type: 'date', date: { start: moment().day(1).format('YYYY-MM-DD') } },
+    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
+  }
+  createPage(parent, properties)
+}
+
+const _createAttendance = () => {
+  let properties = {
+    Name: { type: 'title', title: [{ text: { content: 'Attendance' } }] },
+    Scheduled: { type: 'date', date: { start: moment().day(1).format('YYYY-MM-DD') } },
+    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
+  }
+  for (let i = 1; i <=2; i++) {
+    properties['Scheduled'] = { type: 'date', date: { start: moment().day(i).format('YYYY-MM-DD') } },
+    createPage(parent, properties)
+  }
+}
+
+const createWorkTasks = async () => {
+  
+  _createPrs();
+  _createTimesheets();
+  _createAttendance();
 
 }
 
 (async function start() {
+  createWorkTasks();
   // createJournal();
   // createClean();
-  createPhotosTask()
+  // createPhotosTask()
 })();
 
 

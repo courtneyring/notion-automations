@@ -9,7 +9,7 @@ const notion = new Client({
 
 const getUsers = async () => {
   const listUsersResponse = await notion.users.list({})
-  console.log(listUsersResponse)
+  // console.log(listUsersResponse)
 }
 
 const getDatabaseById = async (database_id) => {
@@ -17,14 +17,14 @@ const getDatabaseById = async (database_id) => {
     // database_id: 'fdae95c80f954bc595d659e8accbe15e'
     database_id
   })
-  console.log(db)
+  // console.log(db)
 }
 
 const getPageById = async () => {
-  let page_id = 'be48d29280ad40f9b07ec47ad2eaea11'
+  let page_id = 'd5aee65102d640efa37113c29ce99634'
   const response = await notion.pages.retrieve({ page_id });
   console.log(response);
-  console.log(response.properties.Duration.rich_text)
+  console.log(response.properties.Category.multi_select)
 }
 
 const createPage = async (parent, properties) => {
@@ -32,7 +32,7 @@ const createPage = async (parent, properties) => {
     parent,
     properties
   })
-  console.log(resp)
+  // console.log(resp)
 }
 
 const queryDatabase = async ({database_id, filter, sorts}) => {
@@ -41,7 +41,7 @@ const queryDatabase = async ({database_id, filter, sorts}) => {
     filter, 
     sorts
   })
-  console.log(response.results[0])
+  // console.log(response.results[0])
   return response
 }
 
@@ -51,6 +51,8 @@ const updatePage = async ({page_id, properties}) => {
     properties,
   });
 }
+
+// getPageById();
 
 module.exports = {
   createPage,
