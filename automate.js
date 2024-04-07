@@ -1,5 +1,6 @@
 const { createPage, getPageById, queryDatabase, updatePage } = require('./notion');
 const moment = require('moment');
+const tasks = require('./tasks');
 
 const parent = {
   type: 'database_id',
@@ -11,7 +12,28 @@ function weekOfMonth(m) {
   return m.week() - moment(m).startOf('month').week();
 }
 
+
+const _mapCategories = (category) => {
+  return { name: category }
+}
+
+const _buildProperties = (props) => {
+  let formatted = {
+    ...(props.name && { Name: { type: 'title', title: [{ text: { content: props.name } }] } }),
+    ...(props.scheduled && { Scheduled: { type: 'date', date: { start: moment().day(props.scheduled).format('YYYY-MM-DD')  } } }),
+    ...(props.categories && { Category: { type: 'multi_select', multi_select: props.categories.map(_mapCategories) } })
+  }
+  return formatted
+}
+
+
 const existingCheck = async (name) => {
+  const sorts = [
+    {
+      property: 'Name',
+      direction: 'descending',
+    },
+  ]
   let filter = {
     and: [
       {
@@ -21,80 +43,20 @@ const existingCheck = async (name) => {
         },
       },
       {
-        property: 'Scheduled',
-        date: {
-          on_or_before: moment().format('YYYY-MM-DD')
-        }
-      },
-      {
-        property: 'Status',
-        status: {
-          does_not_equal: 'Done'
-        }
-      }
-    ],
-  }
-  let resp = await queryDatabase({database_id, filter})
-  console.log(resp)
-  return resp.results
-}
-
-const createJournal = async () => {
-  let startDate = moment().day(4).format('YYYY-MM-DD')
-  let properties = {
-    Name: { type: 'title', title: [{ text: { content: 'Journal' } }] },
-    Scheduled: { type: 'date', date: { start: startDate } },
-    Category: {type: 'multi_select', multi_select: [{name: 'Photos'}] }
-  }
-
-  let existingTasks = await existingCheck('Journal');
-  if (existingTasks.length) {
-    await updatePage({ page_id: existingTasks[0].id, properties })
-    console.log('Updated Journal Page')
-  }
-  else {
-    createPage(parent, properties)
-    console.log('Created Journal Page')
-  }
-  
-}
-
-
-const createClean = async () => {
-  if (await existingCheck('Clean')) {
-    console.log('Clean Task Exists')
-    return
-  }
-  let roomArr = ['Kitchen', 'Bedroom', 'Bathroom']
-  let room = roomArr[weekOfMonth(moment())]
-
-  if (room) {
-    let startDate = moment().day(3).format('YYYY-MM-DD')
-    let properties = {
-      Name: { type: 'title', title: [{ text: { content: `Clean - ${room}` } }] },
-      Due: { type: 'date', date: { start: startDate } },
-    }
-    createPage(parent, properties)
-    console.log('Created Clean Task')
-  }
-  console.log('No Clean Task Created')
-}
-
-const _findNext = async () => {
-  const sorts = [
-    {
-      property: 'Name',
-      direction: 'descending',
-    },
-  ]
-
-  let filter = {
-    and: [
-      {
-        property: 'Category',
-        multi_select: {
-          contains: 'Photos',
-        },
+        or: [
+          {
+            property: 'Scheduled',
+            date: {
+              on_or_before: moment().format('YYYY-MM-DD')
+            }
+          },
+          {
+            property: 'Scheduled',
+            date: {
+              is_empty: true
+            }
+          },
+        ],
       },
       {
         property: 'Status',
@@ -105,68 +67,31 @@ const _findNext = async () => {
     ],
   }
   let resp = await queryDatabase({ database_id, filter, sorts })
-  let next = resp.results[0]
-  return next
+  console.log(resp)
+  return resp.results
 }
 
-const createPhotosTask = async () => {
-  const properties = {
-    Scheduled: {
-      date: { start: moment().day(3).format('YYYY-MM-DD') }
-    }
-  }
-  let existingTasks = await existingCheck('Photos');
-  let pageToUpdate = existingTasks.length > 0 ? existingTasks[0] : await _findNext();
-  await updatePage({ page_id: pageToUpdate.id, properties})
-  console.log('Updated Photos Task')
-}
 
-const _createPrs = () => {
-  let properties = {
-    Name: { type: 'title', title: [{ text: { content: 'PRs' } }] },
-    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
+const _genericTaskHandler = async (props) => {
+  let existingTasks = await existingCheck(props.name);
+  if (props.keepName) delete props.name
+  const properties = _buildProperties(props)
+  if (existingTasks.length) {
+    await updatePage({ page_id: existingTasks[0].id, properties })
   }
-
-  for (let i = 1; i < 6; i++) {
-    properties['Scheduled'] = { type: 'date', date: { start: moment().day(i).format('YYYY-MM-DD') } },
-      createPage(parent, properties)
-  }
-}
-
-const _createTimesheets = () => {
-  let properties = {
-    Name: { type: 'title', title: [{ text: { content: 'Timesheets' } }] },
-    Scheduled: { type: 'date', date: { start: moment().day(1).format('YYYY-MM-DD') } },
-    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
-  }
-  createPage(parent, properties)
-}
-
-const _createAttendance = () => {
-  let properties = {
-    Name: { type: 'title', title: [{ text: { content: 'Attendance' } }] },
-    Scheduled: { type: 'date', date: { start: moment().day(1).format('YYYY-MM-DD') } },
-    Category: { type: 'multi_select', multi_select: [{ name: 'Work' }] }
-  }
-  for (let i = 1; i <=2; i++) {
-    properties['Scheduled'] = { type: 'date', date: { start: moment().day(i).format('YYYY-MM-DD') } },
+  else {
     createPage(parent, properties)
   }
-}
-
-const createWorkTasks = async () => {
-  
-  _createPrs();
-  _createTimesheets();
-  _createAttendance();
 
 }
+
 
 (async function start() {
-  createWorkTasks();
-  // createJournal();
-  // createClean();
-  // createPhotosTask()
+ 
+  for (let task of tasks) {
+    await _genericTaskHandler(task)
+  }
+
 })();
 
 

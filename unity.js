@@ -22,7 +22,7 @@ const makePage = ({ pathway, mission, project, tutorial, missionIdx, projectIdx,
 const getData = async () => {
 
 
-  let resp = await fetch('https://learn.unity.com/api/learn/project/612f9602edbc2a1b588a3af3/extends?edit=false&missionId=5f77cc6bedbc2a4a1dbddc46&pathwayId=5f7bcab4edbc2a0023e9c38f&contentId=65451ee5edbc2a24e6ec5e3a&uv=2021.3');
+  let resp = await fetch('https://learn.unity.com/api/learn/mission/5f71fe63edbc2a00200e9de0/extends?edit=false&missionId=5f71fe63edbc2a00200e9de0&pathwayId=5f7e17e1edbc2a5ec21a20af&contentId=5f7229b2edbc2a001f834db7');
   let data = await resp.json();
 
   let pathway = data.breadcrumb.root;
