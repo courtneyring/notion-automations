@@ -54,16 +54,35 @@ module.exports = (() => {
       categories: ['Weeklys']
     },
     {
+      name: 'Emails',
+      scheduled: 1,
+      categories: ['Weeklys']
+    },
+    {
+      disabled: moment().date() > 7,
+      scheduled: 3,
+      name: `Photos - ${moment().subtract(1, 'month').format('YYYY-MM')
+        }`,
+      categories: ['Photos'],
+    },
+    {
       name: 'Photos',
+      disabled: moment().date() <= 7,
       scheduled: 3,
       categories: ['Photos', 'Weeklys'],
       keepName: true
-    }, 
+    },
     {
       name: `Clean - ${rooms[moment().week() % 3]}`,
       scheduled: 3,
       categories: ['Weeklys'],
     }, 
+    {
+      disabled: moment().date() < 24,
+      name: 'CC & Cell Phone',
+      scheduled: 1,
+      categories: ['Weeklys']
+    }
 
   ]
 })();

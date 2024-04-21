@@ -73,6 +73,7 @@ const existingCheck = async (name) => {
 
 
 const _genericTaskHandler = async (props) => {
+  if (props.disabled) return;
   let existingTasks = await existingCheck(props.name);
   if (props.keepName) delete props.name
   const properties = _buildProperties(props)
