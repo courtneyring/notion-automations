@@ -1,6 +1,7 @@
 const { createPage, getPageById, queryDatabase, updatePage } = require('./notion');
 const moment = require('moment');
 const tasks = require('./tasks');
+const {listEvents} = require('./google');
 
 const parent = {
   type: 'database_id',
@@ -20,8 +21,10 @@ const _mapCategories = (category) => {
 const _buildProperties = (props) => {
   let formatted = {
     ...(props.name && { Name: { type: 'title', title: [{ text: { content: props.name } }] } }),
-    ...(props.scheduled && { Scheduled: { type: 'date', date: { start: moment().day(props.scheduled).format('YYYY-MM-DD')  } } }),
-    ...(props.categories && { Category: { type: 'multi_select', multi_select: props.categories.map(_mapCategories) } })
+    ...(props.scheduled && { Scheduled: { type: 'date', date: { start: moment().day(props.scheduled).format('YYYY-MM-DD') } } }),
+    ...(props.categories && { Category: { type: 'multi_select', multi_select: props.categories.map(_mapCategories) } }),
+    ...(props.gid && { gid: { type: 'rich_text', rich_text: [{text: {content:props.gid}}] } })
+
   }
   return formatted
 }
@@ -86,12 +89,28 @@ const _genericTaskHandler = async (props) => {
 
 }
 
+_syncCalendarEvents = async () => {
+  let events = await listEvents();
+  console.log(events)
+  for (let event of events) {
+    let props = {
+      name: event.summary,
+      scheduled: parseInt(moment(event.start.dateTime || event.start.date).format('d')),
+      categories: ['Google Calendar'], 
+      gid: event.id
+    }
+    const properties = _buildProperties(props)
+    await createPage(parent, properties)
+  }
+}
+
 
 (async function start() {
- 
+
   for (let task of tasks) {
-    await _genericTaskHandler(task)
+    await _genericTaskHandler(task)   
   }
+  await _syncCalendarEvents();
 
 })();
 

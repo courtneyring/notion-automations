@@ -67,28 +67,34 @@ async function authorize() {
  * Lists the next 10 events on the user's primary calendar.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-async function listEvents(auth) {
+async function listEvents() {
+  const auth = await authorize();
   const calendar = google.calendar({ version: 'v3', auth });
+  const today = new Date();
+  const oneWeekFromNow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7).toISOString();
   const res = await calendar.events.list({
     calendarId: 'primary',
     timeMin: new Date().toISOString(),
-    maxResults: 10,
-    singleEvents: true,
+    timeMax: oneWeekFromNow,
     orderBy: 'startTime',
+    singleEvents: true
   });
   const events = res.data.items;
+  // console.log(res.data.items.length)
   if (!events || events.length === 0) {
     console.log('No upcoming events found.');
     return;
   }
-  console.log('Upcoming 10 events:');
-  events.map((event, i) => {
-    const start = event.start.dateTime || event.start.date;
-    console.log(`${start} - ${event.summary}`);
-  });
+  // events.map((event, i) => {
+  //   console.log(event)
+  //   const start = event.start.dateTime || event.start.date;
+  //   console.log(`${start} - ${event.summary}`);
+  // });
+  return events
 }
 
-async function syncResources(auth) {
+async function syncResources() {
+  const auth = await authorize();
   const calendar = google.calendar({ version: 'v3', auth });
   const today = new Date();
   const twoWeeksFromNow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14).toISOString();
@@ -106,6 +112,10 @@ async function syncResources(auth) {
     const start = event.start.dateTime || event.start.date;
     console.log(`${start} - ${event.summary}`);
   });
+
 }
 
-authorize().then(syncResources).catch(console.error);
+// authorize().then(listEvents).catch(console.error);
+module.exports = {
+  listEvents
+}
