@@ -35,28 +35,42 @@ const createPage = async (parent, properties) => {
   // console.log(resp)
 }
 
-const queryDatabase = async ({database_id, filter, sorts}) => {
+const queryDatabase = async ({ database_id, filter, sorts }) => {
   const response = await notion.databases.query({
     database_id,
-    filter, 
+    filter,
     sorts
   })
   // console.log(response.results[0])
   return response
 }
 
-const updatePage = async ({page_id, properties}) => {
+const updatePage = async ({ page_id, properties }) => {
   const response = await notion.pages.update({
     page_id,
     properties,
   });
 }
 
+const buildProperties = (props) => {
+  let formatted = {
+    ...(props.name && { Name: { type: 'title', title: [{ text: { content: props.name } }] } }),
+    ...(props.scheduled && { Scheduled: { type: 'date', date: { start: moment().day(props.scheduled).format('YYYY-MM-DD') } } }),
+    ...(props.categories && { Category: { type: 'multi_select', multi_select: props.categories.map(_mapCategories) } }),
+    ...(props.gid && { gid: { type: 'rich_text', rich_text: [{ text: { content: props.gid } }] } })
+
+  }
+  return formatted
+}
+
+
+
 // getPageById();
 
 module.exports = {
   createPage,
   getPageById,
-  queryDatabase, 
-  updatePage
+  queryDatabase,
+  updatePage,
+  buildProperties
 }
