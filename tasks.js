@@ -25,33 +25,8 @@ module.exports = (() => {
       categories: ['Work']
     },
     {
-      name: 'PRs',
-      scheduled: 1,
-      categories: ['Work']
-    },
-    {
-      name: 'PRs',
-      scheduled: 2,
-      categories: ['Work']
-    },
-    {
-      name: 'PRs',
-      scheduled: 3,
-      categories: ['Work']
-    },
-    {
-      name: 'PRs',
-      scheduled: 4,
-      categories: ['Work']
-    },
-    {
-      name: 'PRs',
-      scheduled: 5,
-      categories: ['Work']
-    },
-    {
       name: 'Journal',
-      scheduled: 4,
+      scheduled: 5,
       categories: ['Weeklys']
     },
     {
@@ -84,18 +59,18 @@ module.exports = (() => {
       scheduled: 1,
       categories: ['Weeklys']
     }, 
-    {
-      name: 'Water Prayer Plant, Corn Plant, and Rubber Tree',
-      scheduled: 1,
-      categories: ['Weeklys'],
-      disabled: !(moment().week() % 2)
-    },
-    {
-      name: 'Water Ponytail Palm',
-      scheduled: 1,
-      categories: ['Weeklys'],
-      disabled: moment().week() % 4
-    }
+    // {
+    //   name: 'Water Prayer Plant, Corn Plant, and Rubber Tree',
+    //   scheduled: 1,
+    //   categories: ['Weeklys'],
+    //   disabled: !(moment().week() % 2)
+    // },
+    // {
+    //   name: 'Water Ponytail Palm',
+    //   scheduled: 1,
+    //   categories: ['Weeklys'],
+    //   disabled: moment().week() % 4
+    // }
 
   ]
 })();

@@ -1,4 +1,5 @@
 const { Client } = require("@notionhq/client")
+const moment = require('moment');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -50,6 +51,11 @@ const updatePage = async ({ page_id, properties }) => {
     page_id,
     properties,
   });
+}
+
+
+const _mapCategories = (category) => {
+  return { name: category }
 }
 
 const buildProperties = (props) => {
