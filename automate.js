@@ -68,19 +68,23 @@ const _genericTaskHandler = async (props) => {
   if (props.disabled) return;
   let existingTasks = await existingCheck(props.name);
   if (props.keepName) delete props.name
-  const properties = buildProperties(props)
-  if (existingTasks.length) {
-    await updatePage({ page_id: existingTasks[0].id, properties })
+  for (let day of props.day) {
+    props.scheduled = day;
+    const properties = buildProperties(props)
+    if (existingTasks.length) {
+      await updatePage({ page_id: existingTasks[0].id, properties })
+    }
+    else {
+      createPage(parent, properties)
+    }
   }
-  else {
-    createPage(parent, properties)
-  }
+  
 
 }
 
 _syncCalendarEvents = async () => {
   let events = await listEvents();
-  console.log(events)
+  if (!events || !events.length) return 
   for (let event of events) {
     let props = {
       name: event.summary,
