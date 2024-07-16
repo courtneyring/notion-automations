@@ -69,6 +69,27 @@ const buildProperties = (props) => {
   return formatted
 }
 
+const buildProperties2 = (props) => {
+
+  let formatted = {};
+  for (let [key, value] of Object.entries(props)) {
+    if (value.type == 'string') {
+      formatted[key] = { rich_text: [{ text: { content: value.value } }] }
+    }
+    else if (value.type == 'number') {
+      formatted[key] = { number: value.value }
+    }
+    else if (value.type == 'date') {
+      formatted[key] = {type: 'date', date: {start: value.value.start, end: value.value.end}}
+    }
+    else if (value.type == 'title') {
+      formatted[key] = { type: 'title', title: [{ text: { content: value.value } }] }
+    }
+    
+  }
+  return formatted;
+
+}
 
 
 // getPageById();
@@ -78,5 +99,7 @@ module.exports = {
   getPageById,
   queryDatabase,
   updatePage,
-  buildProperties
+  buildProperties,
+  buildProperties2,
+
 }
