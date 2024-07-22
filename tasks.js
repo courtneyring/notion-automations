@@ -15,6 +15,11 @@ module.exports = (() => {
       categories: ['Work']
     },
     {
+      name: 'PRs',
+      day: [1, 2, 3, 4, 5],
+      categories: ['Work']
+    },
+    {
       name: 'Timesheets',
       day: [1],
       categories: ['Work']
