@@ -22,10 +22,12 @@ const getDatabaseById = async (database_id) => {
 }
 
 const getPageById = async () => {
-  let page_id = 'd5aee65102d640efa37113c29ce99634'
+  
+  // https://www.notion.so/test-7ec2f8601c6542efb33cb3ac61f22488?pvs=4
+  let page_id = '7ec2f8601c6542efb33cb3ac61f22488'
   const response = await notion.pages.retrieve({ page_id });
-  console.log(response);
-  console.log(response.properties.Category.multi_select)
+  // console.log(response);
+  // console.log(response.properties.Category.multi_select)
 }
 
 const createPage = async (parent, properties) => {
