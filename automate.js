@@ -19,11 +19,11 @@ const _mapCategories = (category) => {
 }
 
 
-const existingCheck = async ({name, category}) => {
+const existingCheck = async ({name, category, sort}) => {
   // console.log(name, category)
   const sorts = [
     {
-      property: 'Name',
+      property: sort,
       direction: 'descending',
     },
   ]
@@ -51,7 +51,7 @@ const existingCheck = async ({name, category}) => {
           {
             property: 'Scheduled',
             date: {
-              on_or_before: moment().format('YYYY-MM-DD')
+              on_or_before: moment().startOf('week').format('YYYY-MM-DD')
             }
           },
           {
@@ -75,8 +75,9 @@ const existingCheck = async ({name, category}) => {
   return resp.results
 }
 
-const _createUpdateTask = async (props) => {
-  let filter = props.filter ?? { name: props.name }
+const _createUpdateTask = async (props, day) => {
+  let filter = props.filter ?? { name: props.name}
+  filter['sort'] = props.sort || 'Name'
   let existingTasks = await existingCheck(filter);
   if (props.keepName) delete props.name
   props.scheduled = day;
@@ -96,7 +97,7 @@ const _genericTaskHandler = async (props) => {
   for (let day of props.day) {
     let perDay = props.perDay || 1;
     for (let i = 0; i < perDay; i++) {
-      await _createUpdateTask(props);
+      await _createUpdateTask(props, day);
     }
     
   }

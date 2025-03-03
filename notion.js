@@ -1,6 +1,12 @@
+
+// import { Client } from "@notionhq/client";
+// import dotenv from "dotenv";
+// import moment from "moment";
+
 const { Client } = require("@notionhq/client")
 const moment = require('moment');
 const dotenv = require('dotenv');
+
 dotenv.config();
 
 // Initializing a client
@@ -30,10 +36,11 @@ const getPageById = async () => {
   // console.log(response.properties.Category.multi_select)
 }
 
-const createPage = async (parent, properties) => {
+const createPage = async (parent, properties, children) => {
   const resp = await notion.pages.create({
     parent,
-    properties
+    properties, 
+    children
   })
   // console.log(resp)
 }
@@ -93,7 +100,7 @@ const buildProperties2 = (props) => {
 
 }
 
-
+// export default createPage;
 // getPageById();
 
 module.exports = {
