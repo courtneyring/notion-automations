@@ -1,13 +1,37 @@
-const { createPage, getPageById, queryDatabase, updatePage, buildProperties } = require('./notion');
+const { createPage, getPageById, queryDatabase, updatePage, buildProperties, buildIcon } = require('../notion');
 const moment = require('moment');
 const tasks = require('./tasks');
-const { listEvents } = require('./google');
+const workouts = require('./workouts');
+const { listEvents } = require('../google');
 
-const parent = {
-  type: 'database_id',
-  database_id: 'fdae95c80f954bc595d659e8accbe15e'
+// const master_database_id = 'fdae95c80f954bc595d659e8accbe15e'
+// const workouts_database_id = '1a3de2a9118180d19be0f7540c5b8926'
+
+// https://www.notion.so/1a3de2a9118180d19be0f7540c5b8926?v=1a3de2a91181800cb1d8000c1fc43b35&pvs=4
+// let database_id = null;
+// let ignoreExisting = false;
+
+// const parent = {
+//   type: 'database_id',
+//   database_id: database_id
+// }
+
+const taskConfig = {
+  ignoreExisting: false,
+  parent: {
+    type: 'database_id',
+    database_id: 'fdae95c80f954bc595d659e8accbe15e'
+  }
 }
-const database_id = 'fdae95c80f954bc595d659e8accbe15e'
+const workoutConfig = {
+  ignoreExisting: true,
+  parent: {
+    type: 'database_id',
+    database_id: '1a3de2a9118180d19be0f7540c5b8926'
+  }
+}
+
+let config = null;
 
 function weekOfMonth(m) {
   return m.week() - moment(m).startOf('month').week();
@@ -70,7 +94,7 @@ const existingCheck = async ({name, category, sort}) => {
       }
     ],
   }
-  let resp = await queryDatabase({ database_id, filter, sorts })
+  let resp = await queryDatabase({ database_id: config.parent.database_id, filter, sorts })
   // console.log(resp)
   return resp.results
 }
@@ -78,15 +102,16 @@ const existingCheck = async ({name, category, sort}) => {
 const _createUpdateTask = async (props, day) => {
   let filter = props.filter ?? { name: props.name}
   filter['sort'] = props.sort || 'Name'
-  let existingTasks = await existingCheck(filter);
+  let existingTasks = !config.ignoreExisting ? await existingCheck(filter) : [];
   if (props.keepName) delete props.name
   props.scheduled = day;
   const properties = buildProperties(props)
+  const icon = props.icon ? buildIcon(props.icon): null;
   if (existingTasks.length) {
     await updatePage({ page_id: existingTasks[0].id, properties })
   }
   else {
-    await createPage(parent, properties)
+    await createPage({parent: config.parent, properties, icon})
   }
 }
 
@@ -116,15 +141,25 @@ _syncCalendarEvents = async () => {
       gid: event.id
     }
     const properties = buildProperties(props)
-    await createPage(parent, properties)
+    await createPage(config.parent, properties)
   }
 }
 
 
 (async function start() {
+  if (!process.argv[2]) {
+    console.log('Specify a or b Week')
+    return
+  }
 
-  for (let task of tasks) {
-    await _genericTaskHandler(task)
+  // for (let task of tasks) {
+  //  config = taskConfig;
+  //   await _genericTaskHandler(task)
+  // }
+
+  for (let workout of workouts[process.argv[2]]) {
+    config = workoutConfig;
+    await _genericTaskHandler(workout)
   }
   // await _syncCalendarEvents();
 

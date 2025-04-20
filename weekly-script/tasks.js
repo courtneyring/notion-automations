@@ -3,11 +3,11 @@ const rooms = ['Living Room', 'Bedroom', 'Kitchen', 'Office']
 
 module.exports = (() => {
   return [
-    {
-      name: 'Attendance',
-      day: [1, 2],
-      categories: ['Work']
-    },
+    // {
+    //   name: 'Attendance',
+    //   day: [1, 2],
+    //   categories: ['Work']
+    // },
     // {
     //   name: 'PRs',
     //   day: [1, 2, 3, 4, 5],
@@ -18,14 +18,24 @@ module.exports = (() => {
       day: [5],
       categories: ['Work']
     },
-    {
-      name: 'Journal',
-      day: [5],
-      categories: ['Weeklys']
-    },
+    // {
+    //   name: 'Journal',
+    //   day: [5],
+    //   categories: ['Weeklys']
+    // },
     {
       name: 'Emails',
       day: [1],
+      categories: ['Weeklys']
+    },
+    {
+      name: 'Code Practice',
+      day: [2],
+      categories: ['Weeklys']
+    },
+    {
+      name: 'Newsletters',
+      day: [3],
       categories: ['Weeklys']
     },
     // {
@@ -47,7 +57,7 @@ module.exports = (() => {
       day: [1, 2, 3, 4, 5],
       categories: ['Spotify'],
       keepName: true, 
-      perDay: 15,
+      perDay: 17,
       filter: {category: 'Spotify'}, 
       sort: 'Name Trimmed'
     },

@@ -28,19 +28,20 @@ const getDatabaseById = async (database_id) => {
 }
 
 const getPageById = async () => {
-  
+  // https://www.notion.so/AMP-d-1acde2a91181805a874acdd7b69e12c3?pvs=4
   // https://www.notion.so/test-7ec2f8601c6542efb33cb3ac61f22488?pvs=4
-  let page_id = '7ec2f8601c6542efb33cb3ac61f22488'
+  let page_id = '1acde2a91181805a874acdd7b69e12c3'
   const response = await notion.pages.retrieve({ page_id });
-  // console.log(response);
+  console.log(response);
   // console.log(response.properties.Category.multi_select)
 }
 
-const createPage = async (parent, properties, children) => {
+const createPage = async ({parent, properties, children, icon}) => {
   const resp = await notion.pages.create({
     parent,
     properties, 
-    children
+    children,
+    icon
   })
   // console.log(resp)
 }
@@ -78,6 +79,16 @@ const buildProperties = (props) => {
   return formatted
 }
 
+const buildIcon = (icon) => {
+  let formatted = {
+    "type": "external",
+    "external": {
+      "url": icon
+    }
+  }
+  return formatted
+}
+
 const buildProperties2 = (props) => {
 
   let formatted = {};
@@ -110,5 +121,6 @@ module.exports = {
   updatePage,
   buildProperties,
   buildProperties2,
+  buildIcon
 
 }
