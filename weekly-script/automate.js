@@ -156,9 +156,9 @@ _syncCalendarEvents = async () => {
   //  config = taskConfig;
   //   await _genericTaskHandler(task)
   // }
-
+  config = workoutConfig;
   for (let workout of workouts[process.argv[2]]) {
-    config = workoutConfig;
+   
     await _genericTaskHandler(workout)
   }
   // await _syncCalendarEvents();
