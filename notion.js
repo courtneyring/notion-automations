@@ -28,9 +28,7 @@ const getDatabaseById = async (database_id) => {
 }
 
 const getPageById = async () => {
-  // https://www.notion.so/AMP-d-1acde2a91181805a874acdd7b69e12c3?pvs=4
-  // https://www.notion.so/test-7ec2f8601c6542efb33cb3ac61f22488?pvs=4
-  let page_id = '1acde2a91181805a874acdd7b69e12c3'
+  let page_id = '1dede2a9118180b7abb0c36fd78c8400'
   const response = await notion.pages.retrieve({ page_id });
   console.log(response);
   // console.log(response.properties.Category.multi_select)

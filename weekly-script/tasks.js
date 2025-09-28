@@ -1,5 +1,5 @@
-const moment = require('moment');
-const rooms = ['Living Room', 'Bedroom', 'Kitchen', 'Office']
+const moment = require("moment");
+const rooms = ["Living Room", "Bedroom", "Kitchen", "Office"];
 
 module.exports = (() => {
   return [
@@ -14,9 +14,9 @@ module.exports = (() => {
     //   categories: ['Work']
     // },
     {
-      name: 'Timesheets',
+      name: "Timesheets",
       day: [5],
-      categories: ['Work']
+      categories: ["Work"],
     },
     // {
     //   name: 'Journal',
@@ -24,20 +24,20 @@ module.exports = (() => {
     //   categories: ['Weeklys']
     // },
     {
-      name: 'Emails',
+      name: "Emails",
       day: [1],
-      categories: ['Weeklys']
+      categories: ["Weeklys"],
     },
-    {
-      name: 'Code Practice',
-      day: [2],
-      categories: ['Weeklys']
-    },
-    {
-      name: 'Newsletters',
-      day: [3],
-      categories: ['Weeklys']
-    },
+    // {
+    //   name: "Code Practice",
+    //   day: [2],
+    //   categories: ["Weeklys"],
+    // },
+    // {
+    //   name: 'Newsletters',
+    //   day: [3],
+    //   categories: ['Weeklys']
+    // },
     // {
     //   disabled: moment().date() > 7,
     //   day: [3],
@@ -53,46 +53,46 @@ module.exports = (() => {
     //   keepName: true
     // },
     {
-      name: 'Spotify',
+      name: "Spotify",
       day: [1, 2, 3, 4, 5],
-      categories: ['Spotify'],
-      keepName: true, 
-      perDay: 17,
-      filter: {category: 'Spotify'}, 
-      sort: 'Name Trimmed'
+      categories: ["Spotify"],
+      keepName: true,
+      perDay: 20,
+      filter: { category: "Spotify" },
+      sort: "Name Trimmed",
     },
     // {
     //   name: `Clean - Bathroom`,
     //   day: [5],
     //   categories: ['Matt'],
     //   disabled: moment().week() % 4 != 0
-    // }, 
+    // },
     // {
     //   name: `Sheets`,
     //   day: [5],
     //   categories: ['Matt'],
     //   disabled: (moment().week() +2) % 4 != 0
-    // }, 
+    // },
     {
       name: `Clean - ${rooms[moment().week() % rooms.length]}`,
       day: [5],
-      categories: ['Weeklys'],
-    }, 
+      categories: ["Weeklys"],
+    },
     // {
     //   disabled: moment().date() < 24 || moment().date() > 30,
     //   name: 'CC & Cell Phone',
     //   day: [1],
     //   categories: ['Weeklys']
-    // }, 
+    // },
     {
-      name: 'Broadway',
-      day: [1, 2, 3, 4, 5],
-      categories: ['Dailys']
+      name: "Broadway",
+      day: [1, 2, 3],
+      categories: ["Dailys"],
     },
     // {
     //   name: 'Job Search',
     //   day: [1, 2, 3, 4, 5],
     //   categories: ['Dailys']
     // },
-  ]
+  ];
 })();
